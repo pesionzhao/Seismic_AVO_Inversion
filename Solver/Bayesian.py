@@ -72,9 +72,3 @@ class Bayesian(Solver.Solver):
             result = np.exp(miu_m_obs).T
 
         return result
-
-    def one_new_step(self, pre, **kwargs):
-        self.bayesian_inversion(**kwargs)
-
-    def bayesian_inversion(self, pre):
-        miu_vp = np.mean(pre)

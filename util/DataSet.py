@@ -24,9 +24,9 @@ class Train_DataSet():
             theta: 角度制的角度集
         """
         self.theta_rad = np.radians(theta)
-        self.rho = rho[use_layer, use_trace]*1000
-        self.vp = vp[use_layer, use_trace]*1000
-        self.vs = vs[use_layer, use_trace]*1000
+        self.rho = rho[use_layer, use_trace]
+        self.vp = vp[use_layer, use_trace]
+        self.vs = vs[use_layer, use_trace]
         self.use_layer = []
         self.use_layer.append(0 if use_layer.start is None else use_layer.start)
         self.use_layer.append(self.vp.shape[0] if use_layer.stop is None else use_layer.stop)
@@ -53,9 +53,9 @@ class Train_DataSet():
 
     def __str__(self):
         if self.ntraces != 1:
-            return '训练数据为多道数据, 大小为 [layers=%d, traces=%d]' % (self.layers, self.ntraces)
+            return f'训练数据为多道数据, 大小为 [layers={self.use_layer}, traces={self.use_trace}]'
         else:
-            return '训练数据为单道数据， 大小为[layers=%d,]' % self.layers
+            return f'训练数据为单道数据， 第{self.use_trace}道， 大小为[layers={self.use_layer},]'
 
     def show(self):
         def format_x_ticks(x, pos):
@@ -117,7 +117,6 @@ class Real_Dataset():
                 raise ValueError("多道：模型与数据层数不一致")
             if self.vp_init.shape[-1] != self.seismic_data.shape[0]:
                 raise ValueError("多道：模型与数据道数不一致")
-
 
 class DataReader(metaclass=ABCMeta):
     @abstractmethod

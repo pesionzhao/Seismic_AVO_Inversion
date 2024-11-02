@@ -1,8 +1,7 @@
+.vscode/
 .idea/
 __pycache__/
 *.mat
 test01.py
-Network/
-.vscode/
-Forward/
+test02.py
 DataSet/

@@ -1,3 +1,6 @@
+# 通过yaml文件进行建造者的几个实例化, 用户可按如下方式指定自己的建造者实例,指定优化方法solver和正则化项reg即可
+
+## 使用LM方法优化带有一范数约束的优化问题
 LM_IRLS:
   solver:
     name: 'LM'
@@ -9,6 +12,7 @@ LM_IRLS:
     alpha: 0.01
     eps: 0.1
 
+## 使用高斯牛顿方法优化带有一范数约束的优化问题
 GN_IRLS:
   solver:
     name: 'GN'
@@ -19,6 +23,7 @@ GN_IRLS:
     alpha: 0.00002
     eps: 0.01
 
+# TODO Split Bregman有一些问题还未解决
 SB_TV:
   solver:
     name: 'SB'
@@ -33,3 +38,36 @@ SB_TV:
     alpha: 0.002
     tau: 1
     lamb: 0.001
+
+GD:
+  solver:
+    name: 'GD'
+    iters: 100
+    milestone: []
+    step_size: [[0.2,0.2,0.1]]
+#    step_size1: [10000,10000,5000]
+  reg:
+    name: 'IRLS'
+    alpha: 0.1
+    eps: 0.0001
+
+GD_IRLS:
+  solver:
+    name: 'GD'
+    iters: 200
+    step_size: 6000 # 步长
+  reg:
+    name: 'IRLS'
+    alpha: 0.01
+    eps: 0.1
+
+LM:
+  solver:
+    name: 'LM'
+    iters: 200
+    lamb: 0.001
+    step_size: 14 # 步长
+  reg:
+    name: 'NoReg'
+    alpha: 0.01
+    eps: 0.1

@@ -3,6 +3,8 @@ datapath: 'NetWork/dataset/Marmousi_1_3401.mat'
 dt0: 0.002
 wave_f: 30
 wave_n0: 80
-use_trace: [0,200,null]
-use_layer: [0,100,null]
-theta: [1, 5, 9, 13, 17, 21, 25, 29, 33, 37]
+#use_trace: [0,null,null]
+use_trace: 100
+use_layer: [100,300,null]
+theta: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+#theta: [1, 5, 9, 13, 17, 21, 25, 29, 33, 37]

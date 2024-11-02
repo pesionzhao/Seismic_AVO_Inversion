@@ -16,11 +16,14 @@ import numpy as np
 class Builder(metaclass=ABCMeta):
     @abstractmethod
     def calculate_residual(self, vp, vs, rho, obs):
+        """计算损失"""
         pass
 
     @abstractmethod
     def inverseRun(self):
+        """反演入口"""
         pass
+
 
 
 class SimulateBuilder(Builder):
@@ -36,9 +39,10 @@ class SimulateBuilder(Builder):
                                                  self.settings.wavemat)
         else:
             self.obs = obs
-        print(dataset)
+        # print(dataset)
         print(forwardmodel)
         print(solver)
+        print(reg)
 
     def calculate_residual(self, vp, vs, rho, obs):
         cal_data = self.forwardmodel.forward(vp, vs, rho, self.dataset.theta_rad, self.settings.wavemat)
@@ -62,13 +66,19 @@ class SimulateBuilder(Builder):
                                                      pre[2 * self.dataset.layers:],
                                                      self.dataset.theta_rad,
                                                      self.settings.wavemat)
+                jac = self.forwardmodel.jacobian_(pre[:self.dataset.layers],
+                                                pre[self.dataset.layers:2 * self.dataset.layers],
+                                                pre[2 * self.dataset.layers:],
+                                                self.dataset.theta_rad,
+                                                self.settings.wavemat)
                 res, jacbian = self.reg.update(pre, res, jacbian)
                 pre = self.solver.one_step(pre, jacbian, res, self.dataset.ntraces)
+                self.solver.step(i)
                 rmse = np.linalg.norm(res)  # 显示的损失和回传的损失不一样哦
                 t.set_postfix(loss=rmse)
                 loss.append(rmse)
                 t.update(1)
-        return pre
+        return pre, loss
 
     def solve_sb(self, vp_back, vs_back, rho_back, obs):
         pre = np.vstack((vp_back, vs_back, rho_back)) if self.forwardmodel.ntraces != 1 else \
