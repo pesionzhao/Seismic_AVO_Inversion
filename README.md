@@ -1,7 +1,7 @@
 ## 叠前地震数据三参数反演
 
 工厂设计模式实现叠前三参数的线性反演与非线性反演，此仓库为解决优化非线性或线性方程 $\min\limits_x||g(x)-b||+\lambda(x)$
-的框架, $g(x)$可以是任意以$x$相关的函数
+的框架, $g(x)$可以是任意与 $x$ 相关的函数
 
 ### 文件树
 
@@ -12,6 +12,7 @@
 ├─Solver　＃　优化策略
 ├─util　#　其他
 ```
+
 ### 配置文件格式与基类注释
 
 数据类型
@@ -24,7 +25,7 @@ seismic_data的shape为`[traces, layers, theta]` 或 `[layers, theta]`
 
 博客网址 [反演基础](https://pesionzhao.github.io/SeismicInversion/Util/#_7)
 
-`Forward/`文件夹为正演模型, 也就是$g(x)$的实现, 需要规定$g(x)$的以及$g(x)'$的计算方式, 目前已经实现了Zoeppritz非线性正演模型, 
+`Forward/`文件夹为正演模型, 也就是$g(x)$的实现, 需要规定$g(x)$的以及$g(x)'$的计算方式, 目前已经实现了Zoeppritz非线性正演模型,
 Aki-Richards非线性正演模型, 以及简化的Aki-Richards线性正演模型.
 
 以下是Forward的基类, 如果想指定自己的正演模型,需要重写`forward()`: $g(x)$的计算方法, `jacobian`: $g(x)$的计算方法
@@ -35,17 +36,17 @@ class BasicForward:
     def forward(self, vp, vs, rho, theta, wavemat):
         """
         通过不同的正演方法获取反射系数
-    
+  
         Args:
             vp: 横波序列
             vs: 纵波序列
             rho: 密度
             theta: 入射角度集
             wavemat: 子波矩阵
-    
+  
         Returns:
             反射系数 rpp
-    
+  
         """
     def showresult(self, dt0, trace, theta):
         """
@@ -67,11 +68,13 @@ class BasicForward:
 
 #### Solver
 
-博客网址: [优化方法笔记](https://pesionzhao.github.io/SeismicInversion/Optimization/#_2) 
+博客网址: [优化方法笔记](https://pesionzhao.github.io/SeismicInversion/Optimization/#_2)
 
 `Solver`文件夹为优化器, 对于可以将反问题写为如下形式的问题
 
-$$\min\limits_x||g(x)-b||^2_2$$
+$$
+\min\limits_x||g(x)-b||^2_2
+$$
 
 可以使用此函数包进行迭代优化, 目前已经完成了梯度下降`GD_solver()`,高斯牛顿法`GN_solver()`, 列文伯格-马夸特方法(Levenberg–Marquardt)
 `LM_solver()`, **Split Bergman方法`SB_solver()`还未完全写好**, 用户如想指定自己的优化器,需要继承`Solver`基类, 并重写`one_step()`方法
@@ -92,11 +95,11 @@ class Solver:
         Notes:
 
             对于求解Gm=d问题,正则化项要拼接在G和d后面形成新的Gm=d,所以格式为[Regop, Regdata], 所以反问题更新为
-            
+          
             [G    ]     [d      ]
-            
+          
             |     | m = |       |
-            
+          
             [Regop]     [Regdata]
 
         Returns:
@@ -107,7 +110,7 @@ class Solver:
 
 #### Regularization
 
-如果优化问题有约束项$\lambda(x)$, 也就是对于$\min\limits_x||g(x)-b||+\lambda(x)$的问题, 则需要指定$\lambda(x)$, 
+如果优化问题有约束项$\lambda(x)$, 也就是对于$\min\limits_x||g(x)-b||+\lambda(x)$的问题, 则需要指定$\lambda(x)$,
 目前只实现了简单的一范数$|x|_1$ (通过IRLS求解) 和二范数$||x||^2_2$约束
 
 ```python
@@ -123,7 +126,7 @@ class Regularization:
             根据配置文件初始化正则化项
 
         """
-        
+      
     def update(self, pre, residual, jacobian):
         """
 
@@ -141,7 +144,7 @@ class Regularization:
         """
 ```
 
-在完成以上操作后,可以通过yaml文件构建优化器, 示例为 `config/MyCfg.yaml`. 
+在完成以上操作后,可以通过yaml文件构建优化器, 示例为 `config/MyCfg.yaml`.
 
 ```yaml
 # 通过yaml文件进行建造者的实例化, 
@@ -177,7 +180,7 @@ theta: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] # 角度
 
 ### 实例化工厂
 
-在指定好正演模型, 优化策略, 正则化项后, 可以进行实例化, 用于整个反演的流程, 在文件`Builder.py`下有示例, 初始化可以自己指定, 如下 
+在指定好正演模型, 优化策略, 正则化项后, 可以进行实例化, 用于整个反演的流程, 在文件`Builder.py`下有示例, 初始化可以自己指定, 如下
 
 ```python
 class SimulateBuilder(Builder):
@@ -205,8 +208,8 @@ class SimulateBuilder(Builder):
 
 #### TODO
 
-- [ ] 一范数的优化
-- [ ] Split-Bregman方法未完成
+- [ ]  一范数的优化
+- [ ]  Split-Bregman方法未完成
 
 欢迎访问我的博客和我交流 https://pesionzhao.github.io/
 
