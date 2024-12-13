@@ -110,8 +110,8 @@ class Solver:
 
 #### Regularization
 
-如果优化问题有约束项$\lambda(x)$, 也就是对于$\min\limits_x||g(x)-b||+\lambda(x)$的问题, 则需要指定$\lambda(x)$,
-目前只实现了简单的一范数$|x|_1$ (通过IRLS求解) 和二范数$||x||^2_2$约束
+如果优化问题有约束项 $\lambda(x)$, 也就是对于 $\min\limits_x||g(x)-b||+\lambda(x)$ 的问题, 则需要指定 $\lambda(x)$ ,
+目前只实现了简单的一范数 $|x|_1$ (通过IRLS求解) 和二范数 $||x||^2_2$ 约束
 
 ```python
 class Regularization:
@@ -201,6 +201,43 @@ class SimulateBuilder(Builder):
         print(solver)
         print(reg)
 ```
+
+### demo
+
+这里我提供了一个基于Aki-RiChards正演使用LM方法，且带有一范数的单道反演的demo， 弹性参数由阻抗数据根据经验公式转换得到，运行demo.py即可
+
+```shell
+python demo.py
+```
+
+之后会打印数据信息，正演模型， 优化器参数等信息，如下:
+
+```text
+读取Marmousi阻抗数据，根据经验公式得到弹性参数，
+vp数据大小 [layers=100, traces=200]
+训练数据为单道数据， 第100道， 大小为[layers=[0, 200],]
+使用原始方法生成子波，
+子波主频为30, 长度为100
+角度序列为[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+正演模型为Aki-Richards
+反演策略为LM
+lambda=0.001000, step_size=5.000000
+Regularization: IRLS, alpha=0.01, eps=0.1
+```
+
+程序运行完毕后可以得到损失函数与反演结果
+
+单道反演结果
+
+![result](Picture/result.png)
+
+损失曲线
+
+![loss](Picture/loss.png)
+
+此后用户可以自定义数据集、优化策略、超参数、正则化项进行客制化反演
+
+---
 
 此项目还存在很多不足之处, 还请大家多多包含, 仅供教学使用, 在处理大规模矩阵时, 会有爆内存的问题, 请大家注意
 

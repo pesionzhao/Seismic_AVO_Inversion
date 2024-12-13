@@ -1,7 +1,5 @@
 .vscode/
 .idea/
 __pycache__/
-*.mat
 test01.py
 test02.py
-DataSet/

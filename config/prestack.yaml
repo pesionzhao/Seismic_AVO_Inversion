@@ -1,10 +1,18 @@
-#datapath: 'DataSet/Marmousi_dataset_dt=8ms.mat'
-datapath: 'NetWork/dataset/Marmousi_1_3401.mat'
+datapath: 'DataSet/Marmousi_dataset_dt=8ms.mat'
 dt0: 0.002
 wave_f: 30
 wave_n0: 80
 #use_trace: [0,null,null]
 use_trace: 100
-use_layer: [100,300,null]
+use_layer: [0,200,null]
 theta: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-#theta: [1, 5, 9, 13, 17, 21, 25, 29, 33, 37]
+# LM_IRLS反演策略，使用LM优化带有一范数的反问题，具体参数说明见config/document.yaml
+solver:
+  name: 'LM'
+  iters: 100
+  lamb: 0.001
+  step_size: 5 # 步长
+reg:
+  name: 'IRLS'
+  alpha: 0.01
+  eps: 0.1

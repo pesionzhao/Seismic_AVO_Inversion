@@ -54,7 +54,7 @@ class GD_solver(Solver):
 
     def one_step(self, pre, jacobian, residual, ntraces, Reg=None):
         lam = 0.001
-        # lam = 0.005  # todo 如何设定lambda
+        # lam = 0.005  # TODO 如何设定lambda
         layers = int(pre.shape[-1]/3)
         if isinstance(self.step_size[self.status], list):
             vp_step = np.full(layers, self.step_size[self.status][0])

@@ -15,7 +15,7 @@ from Forward.Zoeppritz import Zoeppritz
 from Forward.Zoeppritz_Complex import ZoeppritzComp
 from Forward.Aki_Richards import Aki_Richards
 from Forward.Simplify_Aki_Richards import Simplify_Aki_Richards
-from util.DataSet import Train_DataSet, Read_Marmousi, Set_origin, Read_Marmousi2
+from util.DataSet import Train_DataSet, Read_Marmousi_Imp, Set_origin, Read_Marmousi2
 from Builder import SimulateBuilder, Bayesian_builder
 from Solver.Bayesian import Bayesian
 from Solver.Solver import LM_solver, GN_solver, SB_solver, GD_solver
@@ -23,41 +23,51 @@ from Regularization.Regularization import IRLS, NoReg, User_L2
 from util.utils import read_yaml, plot_single_trace, plot_multi_traces, plot_result
 import time
 
+# 指定优化器字典，通过yaml文件的字符串直接初始化对应的优化器
+# LM: Levenberg-Marquardt
+# GN: Gauss-Newton
+# SB: Split-Bregman
+# GD: Gradient Descent
 solver_map = {'LM': LM_solver, 'GN': GN_solver, 'SB': SB_solver, 'GD': GD_solver}
+
+# 指定正则化字典，通过yaml文件的字符串直接初始化对应的正则化
+# IRLS: 一范数
+# NoReg: 无正则化
+# User_L2: 二范数
 reg_map = {'IRLS': IRLS, 'NoReg': NoReg, 'User_L2': User_L2}
+# 读取外部yaml文件
 cfg = read_yaml('config/prestack.yaml')
 cfg = argparse.Namespace(**cfg)
+
 # 数据准备部分
 # datapath = 'DataSet/Marmousi_dataset_dt=8ms.mat'
 datapath = cfg.datapath
-datareader = Read_Marmousi2()
+datareader = Read_Marmousi_Imp()
 datareader.read(datapath)
 print(datareader)
 
-# settings
+# 设置子波
 dt0 = cfg.dt0
 wave_f = cfg.wave_f
 wave_n0 = cfg.wave_n0
+# 反演的道数，根据use_trace数据类型判断单道（int）或者多道(list,按照slice切片)
 if isinstance(cfg.use_trace, list):
     use_trace = slice(cfg.use_trace[0], cfg.use_trace[1], cfg.use_trace[2])
 else:
     use_trace = cfg.use_trace
 
+# 反演的层数，可以单层或者多层（按照slice进行切片）
 if isinstance(cfg.use_layer, list):
     use_layer = slice(cfg.use_layer[0], cfg.use_layer[1], cfg.use_layer[2])
 else:
     use_layer = cfg.use_layer
-# trace = 1
-# theta = [5, 10, 15, 20, 25, 30, 35, 40]
-# theta = [1, 5, 9, 13, 17, 21, 25, 29, 33, 37]  # 用于和matlab代码做对比
 theta = cfg.theta
-config_path = './config/MyCfg.yaml'
-build_method = 'GD'
 
-inv_cfg = read_yaml(config_path, build_method)
-
+# 生成数据集：（根据use_layer和use_trace生成数据集，巴特沃斯低通滤波生成对应的低频模型，角度转为弧度制）
 dataset = Train_DataSet(datareader.vp, datareader.vs, datareader.rho, theta, use_trace, use_layer)
 print(dataset)
+
+# 生成子波
 settings = Set_origin(dataset.layers, dt0, wave_f, wave_n0, theta)
 settings.setup()
 print(settings)
@@ -66,11 +76,15 @@ print(settings)
 # dataset.show()
 
 # 反演流程
-def run():
+def demo():
     # 三种正演模型的选择
-    # forwardmodel = Aki_Richards(dataset.ntraces, dataset.layers)  # TODO layer-1的处理
-    # forwardmodel = Simplify_Aki_Richard(dataset.ntraces, dataset.layers)  # TODO layer-1的处理
-    forwardmodel = ZoeppritzComp(dataset.ntraces, dataset.layers)  # TODO layer-1的处理
+    # Aki_Richards(未考虑虚数)
+    forwardmodel = Aki_Richards(dataset.ntraces, dataset.layers)  # TODO layer-1的处理
+    # 线性简化版Aki_Richards(未考虑虚数)
+    # forwardmodel = Simplify_Aki_Richards(dataset.ntraces, dataset.layers, vsvp=dataset.vs / dataset.vp,
+    #                                      theta=dataset.theta_rad, wavmtx=settings.wavemat)
+    # Zoeppritz(可以考虑虚数)
+    # forwardmodel = ZoeppritzComp(dataset.ntraces, dataset.layers)  # TODO layer-1的处理
 
     # 正演结果显示
     # forwardmodel.forward(dataset.vp, dataset.vs, dataset.rho, dataset.theta_rad, settings.wavemat)
@@ -78,12 +92,12 @@ def run():
 
     # 定义solver
     # solver = LM_solver(config_path=config_path, method=build_method)
-    solver_cfg = inv_cfg['solver']
+    solver_cfg = cfg.solver
     solver = solver_map[solver_cfg['name']](solver_cfg)
 
     # 定义Regularization
     # Reg = NoReg()
-    reg_cfg = inv_cfg['reg']
+    reg_cfg = cfg.reg
     reg = reg_map[reg_cfg['name']]()
 
     # 初始化正则化
@@ -102,6 +116,7 @@ def run():
     plt.title('loss curve')
     plt.show()
 
+
 # 正演耗时计算
 def cal_time():
     forwardmodel = Zoeppritz(dataset.ntraces, dataset.layers)
@@ -117,9 +132,9 @@ def cal_time():
     t3 = time.time()
     # forwardmodel1.showresult(dt0, 0, settings.theta)
 
-    print('Aki_Richards正演用时%f' %(t3-t2))
-    # # scio.savemat('aki_new.mat', {"data":forwardmodel1.cal_data})
+    print('Aki_Richards正演用时%f' % (t3 - t2))
     # plt.show()
+
 
 # 贝叶斯测试
 def beyasian_test():
@@ -148,4 +163,4 @@ def beyasian_test():
 
 
 if __name__ == '__main__':
-    run()
+    demo()

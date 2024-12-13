@@ -28,7 +28,7 @@ def read_yaml(config_path, method=None):
         读取yaml配置文件
 
     """
-    with open(config_path, 'r') as file:
+    with open(config_path, 'r', encoding="utf-8") as file:
         # data = file.read()
         cfg = yaml.safe_load(file)
     if method is not None:
@@ -114,14 +114,14 @@ def plot_result(pre, vp, vs, rho, vp_back, vs_back, rho_back):
 
         ax2.plot(vs_cal, label='inv_vs')
         ax2.plot(vs[:], label='vs')
-        ax2.plot(vs_back, label='mean_vs')
+        ax2.plot(vs_back, label='vs_back')
         ax2.set_title('vs curve', loc='left')
         ax2.set_xlabel('layers')
         ax2.legend()
 
         ax3.plot(rho_cal, label='inv_rho')
         ax3.plot(rho[:], label='rho')
-        ax3.plot(rho_back, label='mean_rho')
+        ax3.plot(rho_back, label='rho_back')
         ax3.set_title('rho curve', loc='left')
         ax3.set_xlabel('layers')
         ax3.legend()

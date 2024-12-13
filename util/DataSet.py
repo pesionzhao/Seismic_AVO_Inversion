@@ -124,7 +124,7 @@ class DataReader(metaclass=ABCMeta):
         pass
 
 
-class Read_Marmousi(DataReader):
+class Read_Marmousi_Imp(DataReader):
     def read(self, datapath):
         data = scio.loadmat(datapath)
         self.vp = data['Marmousi_Imp'] * 1000
@@ -134,7 +134,7 @@ class Read_Marmousi(DataReader):
         self.traces = self.vp.shape[1]
 
     def __str__(self):
-        return '读取Marmousi数据，\nvp数据大小 [layers=%d, traces=%d]' % (self.layers, self.traces)
+        return '读取Marmousi阻抗数据，根据经验公式得到弹性参数，\nvp数据大小 [layers=%d, traces=%d]' % (self.layers, self.traces)
 
 
 class Read_Marmousi2(DataReader):
