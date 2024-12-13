@@ -110,8 +110,8 @@ class Solver:
 
 #### Regularization
 
-如果优化问题有约束项$\lambda(x)$, 也就是对于$\min\limits_x||g(x)-b||+\lambda(x)$的问题, 则需要指定$\lambda(x)$,
-目前只实现了简单的一范数$|x|_1$ (通过IRLS求解) 和二范数$||x||^2_2$约束
+如果优化问题有约束项 $\lambda(x)$ , 也就是对于 $\min\limits_x||g(x)-b||+\lambda(x)$ 的问题, 则需要指定 $\lambda(x)$ ,
+目前只实现了简单的一范数 $|x|_1$ (通过IRLS求解) 和二范数 $||x||^2_2$ 约束
 
 ```python
 class Regularization:
